@@ -72,6 +72,7 @@
 		3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
 		3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
 		3F0543F81C56F78300AA5322 /* external_commit_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */; };
+		3F1A049F1CD3D3710072907E /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
@@ -143,7 +144,6 @@
 		5D432B8D1CC0713F00A610A9 /* LinkingObjectsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D432B8C1CC0713F00A610A9 /* LinkingObjectsTests.mm */; };
 		5D432B8E1CC0713F00A610A9 /* LinkingObjectsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D432B8C1CC0713F00A610A9 /* LinkingObjectsTests.mm */; };
 		5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
-		5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */; };
 		5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5D659E821BE04556006515A0 /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
@@ -1884,7 +1884,6 @@
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
 				021A88371AAFB5CE00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
-				5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */,
 				5D432B8E1CC0713F00A610A9 /* LinkingObjectsTests.mm in Sources */,
 				02AFB4641A80343600E11938 /* PropertyTests.m in Sources */,
 				E856D21C195615A900FB2FCF /* PropertyTypeTest.mm in Sources */,
@@ -1954,6 +1953,7 @@
 				3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */,
 				3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */,
 				3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */,
+				3F1A049F1CD3D3710072907E /* PerformanceTests.m in Sources */,
 				3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */,
 				297FBEFF1C19F844009D1118 /* TestUtils.mm in Sources */,
 				E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */,
