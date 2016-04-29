@@ -46,7 +46,7 @@ struct TransactionChangeInfo {
     std::vector<ListChangeInfo> lists;
     std::vector<CollectionChangeBuilder> tables;
 
-    bool row_did_change(Table const& table, size_t row_ndx, int depth = 0) const;
+    bool row_did_change(Table const& table, size_t row_ndx) const;
 };
 
 // A base class for a notifier that keeps a collection up to date and/or

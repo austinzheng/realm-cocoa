@@ -26,36 +26,63 @@
 using namespace realm;
 using namespace realm::_impl;
 
-bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx, int depth) const
+namespace {
+struct Path {
+    size_t table;
+    size_t row;
+    size_t col;
+};
+
+bool row_did_change(TransactionChangeInfo const& info, Table const& table, size_t idx, Path* path, int depth)
 {
     if (depth > 16)  // arbitrary limit
         return false;
 
     size_t table_ndx = table.get_index_in_group();
-    if (table_ndx < tables.size() && tables[table_ndx].modifications.contains(idx))
+    if (table_ndx < info.tables.size() && info.tables[table_ndx].modifications.contains(idx))
         return true;
+
+    auto already_checking = [&](size_t col) {
+        for (auto p = path; p < path + depth; ++p) {
+            if (p->table == table_ndx && p->row == idx && p->col == col)
+                return true;
+        }
+        path[depth] = {table_ndx, idx, col};
+        return false;
+    };
 
     for (size_t i = 0, count = table.get_column_count(); i < count; ++i) {
         auto type = table.get_column_type(i);
+        if (type != type_Link && type != type_LinkList)
+            continue;
+        if (already_checking(i))
+            continue;
+
         if (type == type_Link) {
             if (table.is_null_link(i, idx))
                 continue;
             auto dst = table.get_link(i, idx);
-            return row_did_change(*table.get_link_target(i), dst, depth + 1);
+            return row_did_change(info, *table.get_link_target(i), dst, path, depth + 1);
         }
-        if (type != type_LinkList)
-            continue;
 
         auto& target = *table.get_link_target(i);
         auto lvr = table.get_linklist(i, idx);
         for (size_t j = 0; j < lvr->size(); ++j) {
             size_t dst = lvr->get(j).get_index();
-            if (row_did_change(target, dst, depth + 1))
+            if (row_did_change(info, target, dst, path, depth + 1))
                 return true;
         }
     }
 
     return false;
+
+}
+} // anonymous namespace
+
+bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx) const
+{
+    Path path[16];
+    return ::row_did_change(*this, table, idx, path, 0);
 }
 
 CollectionNotifier::CollectionNotifier(std::shared_ptr<Realm> realm)
