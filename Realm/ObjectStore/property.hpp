@@ -47,25 +47,6 @@ namespace realm {
         LinkingObjects = 14,
     };
 
-    struct Property {
-        std::string name;
-        PropertyType type;
-        std::string object_type;
-        std::string link_origin_property_name;
-        bool is_primary = false;
-        bool is_indexed = false;
-        bool is_nullable = false;
-
-        size_t table_column = -1;
-        bool requires_index() const { return is_primary || is_indexed; }
-        bool is_indexable() const {
-            return type == PropertyType::Int
-                || type == PropertyType::Bool
-                || type == PropertyType::String
-                || type == PropertyType::Date;
-        }
-    };
-
     static inline const char *string_for_property_type(PropertyType type) {
         switch (type) {
             case PropertyType::String:
@@ -97,6 +78,7 @@ namespace realm {
         std::string name;
         PropertyType type;
         std::string object_type;
+        std::string link_origin_property_name;
         bool is_primary = false;
         bool is_indexed = false;
         bool is_nullable = false;
@@ -124,6 +106,8 @@ namespace realm {
                     return "<" + object_type + ">";
                 case PropertyType::Array:
                     return "array<" + object_type + ">";
+                case PropertyType::LinkingObjects:
+                    return "linking objects<" + object_type + ">";
             }
         }
     };
