@@ -101,17 +101,17 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testArrayStuff {
-    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        RLMRealm *realm = [self testRealm];
-        [realm beginWriteTransaction];
-        CycleObject1 *obj = [CycleObject1 createInRealm:realm withValue:@[@[]]];
-        for (int i = 0; i < 500; ++i)
-            [obj.array addObject:[CycleObject2 createInRealm:realm withValue:@[obj]]];
-        for (int i = 0; i < 500; ++i) {
-            [CycleObject1 createInRealm:realm withValue:@[[CycleObject2 allObjectsInRealm:realm]]];
-        }
-        [realm commitWriteTransaction];
+    RLMRealm *realm = [self testRealm];
+    [realm beginWriteTransaction];
+    CycleObject1 *obj = [CycleObject1 createInRealm:realm withValue:@[@[]]];
+    for (int i = 0; i < 4000; ++i)
+        [obj.array addObject:[CycleObject2 createInRealm:realm withValue:@[obj]]];
+    for (int i = 0; i < 4000; ++i) {
+        [CycleObject1 createInRealm:realm withValue:@[[CycleObject2 allObjectsInRealm:realm]]];
+    }
+    [realm commitWriteTransaction];
 
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMResults *results = [CycleObject1 allObjectsInRealm:realm];
         id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
             CFRunLoopStop(CFRunLoopGetCurrent());

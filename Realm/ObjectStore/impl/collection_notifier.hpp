@@ -75,6 +75,8 @@ private:
     };
     Path m_current_path[16];
 
+    void populate_link_info();
+
     bool row_did_change(Table const& table, size_t row_ndx, int depth = 0);
     bool check_outgoing_links(size_t table_ndx, Table const& table, size_t row_ndx, int depth = 0);
 };

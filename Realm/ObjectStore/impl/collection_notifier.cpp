@@ -87,6 +87,11 @@ RowDidChange::RowDidChange(TransactionChangeInfo const& info, Table const& root_
 {
 }
 
+void RowDidChange::populate_link_info()
+{
+
+}
+
 bool RowDidChange::check_outgoing_links(size_t table_ndx, Table const& table, size_t row_ndx, int depth)
 {
     if (table_ndx >= m_cached_link_info.size())
@@ -124,7 +129,7 @@ bool RowDidChange::check_outgoing_links(size_t table_ndx, Table const& table, si
 
         auto& target = *table.get_link_target(link.col_ndx);
         auto lvr = table.get_linklist(link.col_ndx, row_ndx);
-        for (size_t j = 0; j < lvr->size(); ++j) {
+        for (size_t j = 0, size = lvr->size(); j < size; ++j) {
             size_t dst = lvr->get(j).get_index();
             if (row_did_change(target, dst, depth + 1))
                 return true;
@@ -150,11 +155,12 @@ bool RowDidChange::row_did_change(Table const& table, size_t idx, int depth)
 
     if (table_ndx < m_info.tables.size() && m_info.tables[table_ndx].modifications.contains(idx))
         return true;
-    if (m_not_modified[table_ndx].contains(idx))
+    auto& not_modified = m_not_modified[table_ndx];
+    if (not_modified.contains(idx))
         return false;
     bool ret = check_outgoing_links(table_ndx, table, idx, depth);
     if (!ret)
-        m_not_modified[table_ndx].add(idx);
+        not_modified.add(idx);
     return ret;
 }
 
