@@ -79,6 +79,79 @@ bool row_did_change(TransactionChangeInfo const& info, Table const& table, size_
 }
 } // anonymous namespace
 
+RowDidChange::RowDidChange(TransactionChangeInfo const& info, Table const& root_table)
+: m_info(info)
+, m_root_table(root_table)
+, m_root_table_ndx(root_table.get_index_in_group())
+, m_root_modifications(m_root_table_ndx < info.tables.size() ? &info.tables[m_root_table_ndx].modifications : nullptr)
+{
+}
+
+bool RowDidChange::check_outgoing_links(size_t table_ndx, Table const& table, size_t row_ndx, int depth)
+{
+    if (table_ndx >= m_cached_link_info.size())
+        m_cached_link_info.resize(table_ndx + 1);
+    if (!m_cached_link_info[table_ndx]) {
+        std::vector<Link> links;
+        for (size_t i = 0, count = table.get_column_count(); i < count; ++i) {
+            auto type = table.get_column_type(i);
+            if (type == type_Link || type == type_LinkList) {
+                links.push_back({i, type, table.get_link_target(i)->get_index_in_group()});
+            }
+        }
+        m_cached_link_info[table_ndx] = move(links);
+    }
+
+    auto already_checking = [&](size_t col) {
+        for (auto p = m_current_path; p < m_current_path + depth; ++p) {
+            if (p->table == table_ndx && p->row == row_ndx && p->col == col)
+                return true;
+        }
+        m_current_path[depth] = {table_ndx, row_ndx, col};
+        return false;
+    };
+
+    auto const& links = *m_cached_link_info[table_ndx];
+    for (auto const& link : links) {
+        if (already_checking(link.col_ndx))
+            continue;
+        if (link.type == type_Link) {
+            if (table.is_null_link(link.col_ndx, row_ndx))
+                continue;
+            auto dst = table.get_link(link.col_ndx, row_ndx);
+            return row_did_change(*table.get_link_target(link.col_ndx), dst, depth + 1);
+        }
+
+        auto& target = *table.get_link_target(link.col_ndx);
+        auto lvr = table.get_linklist(link.col_ndx, row_ndx);
+        for (size_t j = 0; j < lvr->size(); ++j) {
+            size_t dst = lvr->get(j).get_index();
+            if (row_did_change(target, dst, depth + 1))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool RowDidChange::operator()(size_t ndx)
+{
+    if (m_root_modifications && m_root_modifications->contains(ndx))
+        return true;
+    return check_outgoing_links(m_root_table_ndx, m_root_table, ndx);
+}
+
+bool RowDidChange::row_did_change(Table const& table, size_t idx, int depth)
+{
+    if (depth > 16)  // arbitrary limit
+        return false;
+
+    size_t table_ndx = table.get_index_in_group();
+    if (table_ndx < m_info.tables.size() && m_info.tables[table_ndx].modifications.contains(idx))
+        return true;
+    return check_outgoing_links(table_ndx, table, idx, depth);
+}
+
 bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx) const
 {
     Path path[16];

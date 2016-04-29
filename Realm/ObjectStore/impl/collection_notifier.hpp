@@ -49,6 +49,35 @@ struct TransactionChangeInfo {
     bool row_did_change(Table const& table, size_t row_ndx) const;
 };
 
+class RowDidChange {
+public:
+    RowDidChange(TransactionChangeInfo const& info, Table const& root_table);
+    bool operator()(size_t row_ndx);
+
+private:
+    TransactionChangeInfo const& m_info;
+    Table const& m_root_table;
+    const size_t m_root_table_ndx;
+    IndexSet const* const m_root_modifications;
+
+    struct Link {
+        size_t col_ndx;
+        DataType type;
+        size_t target_table_ndx;
+    };
+    std::vector<util::Optional<std::vector<Link>>> m_cached_link_info;
+
+    struct Path {
+        size_t table;
+        size_t row;
+        size_t col;
+    };
+    Path m_current_path[16];
+
+    bool row_did_change(Table const& table, size_t row_ndx, int depth = 0);
+    bool check_outgoing_links(size_t table_ndx, Table const& table, size_t row_ndx, int depth = 0);
+};
+
 // A base class for a notifier that keeps a collection up to date and/or
 // generates detailed change notifications on a background thread. This manages
 // most of the lifetime-management issues related to sharing an object between
