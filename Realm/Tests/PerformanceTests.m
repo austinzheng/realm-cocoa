@@ -105,8 +105,11 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         RLMRealm *realm = [self testRealm];
         [realm beginWriteTransaction];
         CycleObject1 *obj = [CycleObject1 createInRealm:realm withValue:@[@[]]];
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 500; ++i)
             [obj.array addObject:[CycleObject2 createInRealm:realm withValue:@[obj]]];
+        for (int i = 0; i < 500; ++i) {
+            [CycleObject1 createInRealm:realm withValue:@[[CycleObject2 allObjectsInRealm:realm]]];
+        }
         [realm commitWriteTransaction];
 
         RLMResults *results = [CycleObject1 allObjectsInRealm:realm];
