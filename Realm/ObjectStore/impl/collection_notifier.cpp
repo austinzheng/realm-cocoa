@@ -147,9 +147,15 @@ bool RowDidChange::row_did_change(Table const& table, size_t idx, int depth)
         return false;
 
     size_t table_ndx = table.get_index_in_group();
+
     if (table_ndx < m_info.tables.size() && m_info.tables[table_ndx].modifications.contains(idx))
         return true;
-    return check_outgoing_links(table_ndx, table, idx, depth);
+    if (m_not_modified[table_ndx].contains(idx))
+        return false;
+    bool ret = check_outgoing_links(table_ndx, table, idx, depth);
+    if (!ret)
+        m_not_modified[table_ndx].add(idx);
+    return ret;
 }
 
 bool TransactionChangeInfo::row_did_change(Table const& table, size_t idx) const

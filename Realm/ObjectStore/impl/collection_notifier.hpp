@@ -59,6 +59,7 @@ private:
     Table const& m_root_table;
     const size_t m_root_table_ndx;
     IndexSet const* const m_root_modifications;
+    std::unordered_map<size_t, IndexSet> m_not_modified;
 
     struct Link {
         size_t col_ndx;
